@@ -1,0 +1,787 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="css/miestilo.css">
+
+
+
+    <script>
+
+      function validaRut(campo){
+        if ( campo.length == 0 ){ return false; }
+        if ( campo.length < 8 ){ return false; }
+
+        campo = campo.replace('-','')
+        campo = campo.replace(/\./g,'')
+
+        var suma = 0;
+        var caracteres = "1234567890kK";
+        var contador = 0;    
+        for (var i=0; i < campo.length; i++){
+          u = campo.substring(i, i + 1);
+          if (caracteres.indexOf(u) != -1)
+          contador ++;
+        }
+        if ( contador==0 ) { return false }
+        
+        var rut = campo.substring(0,campo.length-1)
+        var drut = campo.substring( campo.length-1 )
+        var dvr = '0';
+        var mul = 2;
+        
+        for (i= rut.length -1 ; i >= 0; i--) {
+          suma = suma + rut.charAt(i) * mul
+                      if (mul == 7) 	mul = 2
+                  else	mul++
+        }
+        res = suma % 11
+        if (res==1)		dvr = 'k'
+                      else if (res==0) dvr = '0'
+        else {
+          dvi = 11-res
+          dvr = dvi + ""
+        }
+        if ( dvr != drut.toLowerCase() ) { return false; }
+        else { return true; }
+      }
+  
+    </script>
+
+    <script>
+      function sololetras(e) {
+        key=e.keyCode || e.which;
+ 
+        teclado=String.fromCharCode(key).toLowerCase();
+ 
+        letras="qwertyuiopasdfghjklñzxcvbnm";
+ 
+        especiales="8-37-38-46-164";
+ 
+        teclado_especial=false;
+ 
+        for(var i in especiales){
+            if(key==especiales[i]){
+                teclado_especial=true;
+                break;
+            }
+        }
+ 
+        if(letras.indexOf(teclado)==-1 && !teclado_especial){
+            return false;
+        }
+    }
+      
+    </script>
+
+
+    <script>
+      function valida_numeros(evt)
+      {
+        var code = (evt.which) ? evt.which : evt.keyCode;
+        if(code==8) 
+        {
+          //backspace
+          return true;
+        }
+        else if(code>=48 && code<=57) 
+        {
+          //is a number
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      }
+    </script>
+
+
+    <script>
+       jQuery.validator.addMethod("valida_rut", function(value, element) { 
+        return this.optional(element) || validaRut(value); 
+      }, "Debe ingresar un rut válido");
+
+      jQuery.validator.addMethod("valida_edad", function(value, element) { 
+        
+        let fecha = value.split("-");
+        let anio = fecha[0];
+        let mes = fecha[1];
+        let dia = fecha[2];
+
+        let edad = 18;
+        let mi_fecha = new Date();
+
+        mi_fecha.setFullYear(anio, mes-1, dia);
+
+        let fecha_actual = new Date();
+        let setFecha = new Date();
+
+        setFecha.setFullYear(mi_fecha.getFullYear() + edad,mes-1,dia);
+
+        if ((fecha_actual - setFecha)>0){
+          return true; 
+        }else{
+          return false;
+        }
+
+      }, "Debe ser mayor de edad");
+
+
+      function validaEmail(valor){
+          re=/^([\da-z_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/
+          if(!re.exec(valor)){
+              return false;
+          }else{
+              return true;
+          }
+      }
+
+
+      
+
+      function validaNumRut(camporut){
+        if(camporut.length < 14){
+          return false;
+        }else{
+          return true;
+        }
+      }
+
+      jQuery.validator.addMethod("valida_num_rut", function(value, element) { 
+        return this.optional(element) || validaNumRut(value); 
+      }, "Debe ingresar 14 digitos");
+
+
+      jQuery.validator.addMethod("valida_mail", function(value, element) { 
+        return this.optional(element) || validaEmail(value); 
+      }, "Debe ingresar un mail válido");
+
+
+      
+
+     
+
+
+
+      $(function(){
+        $("#formulario").validate({
+          rules:{
+            rut:{
+              required:true,
+              valida_rut:true
+            },
+            nombre:{
+              required: true
+            },
+            correo:{
+              required: true,
+              valida_mail: true
+            },
+            nacimiento:{
+              required:true,
+              valida_edad: true
+            },
+            fono:{
+              valida_num_rut:true
+            }
+          },
+
+          messages: {
+            rut : { 
+              required:"Debe ingresar el rut"
+            },
+            nombre: {
+              required: "Debe ingresar su nombre"
+            },
+            nacimiento:{
+              required: "Debe ingresar su fecha de nacimiento"
+            },
+            correo: {
+              required: "Debe ingresar su correo"
+
+            },
+            mensaje: {
+              required: "Debe ingresar un mensaje"
+            }
+
+          }
+        });
+      })
+    </script>
+
+    <script>
+      function countChars(obj){
+        document.getElementById("charNum").innerHTML = obj.value.length+' characters';
+      }
+
+      function countChars(obj){
+        var maxLength = 200;
+        var strLength = obj.value.length;
+        
+        if(strLength > maxLength){
+            document.getElementById("charNum").innerHTML = '<span style="color: red;">'+strLength+' out of '+maxLength+' characters</span>';
+        }else{
+            document.getElementById("charNum").innerHTML = strLength+' de un máximo de '+maxLength+' caracteres';
+        }
+      }
+    </script>
+
+    <script>
+      function formatRut(rut){
+        rut.value=rut.value.replace(/[.-]/g, '')
+      .replace( /^(\d{1,2})(\d{3})(\d{3})(\w{1})$/, '$1.$2.$3-$4')}
+    </script>
+
+    <script>
+      function formatFono(fono){
+        fono.value=fono.value.replace(/[+-]/g, '')
+        .replace( /^(\d{3})(\d{4})(\d{4})$/, '+$1-$2-$3')}
+    </script>
+
+    
+
+
+</head>
+
+
+<body>
+    <header>
+        <div id="encabezado">
+            <img id="logo" src="img/GAMHAL/cabeza-pag.jpg" alt="">
+            <br/>
+        </div>
+    </header>
+
+    <nav class="container" id="menu">
+        <ul class="nav justify-content-center">
+            <li class="nav-item col-sm-12 col-lg-4">
+                <button class="dest1 tamano" data-toggle="modal" data-target="#">
+                    Inicio
+                </button>
+            </li>
+            <li class="nav-item col-sm-12 col-lg-4">
+                <div class="container">
+                    <button class="dest1 tamano" data-toggle="modal" data-target="#alertaModal1">
+                        Quienes Somos
+                    </button>
+            
+                    <div class="modal" id="alertamodal1" tabindex="-1" role="dialog" aria-labelledby="titulo" aria-hidden="true">
+                        <div class="modal-dialog modal-xl" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header etiqueta_modal">
+                                    <h5 id="titulo">Quienes Somos</h5>
+                                    <button class="close" data-dismiss="modal" aria-label="cerrar">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+            
+                                <div class="modal-body">
+                                    <p>GAMHAL, Empresa chilena fundada en Mayo de 2008, funciona a nivel nacional e internacional. Somos fabricantes de todos nuestros equipos con un diseño de alta tecnología principalmente para la extracción de gases en laboratorios.
+
+                                      Todos los productos son fabricados de acuerdo con los modelos estándares internacionales. Cuenta con Servicio Técnico propio, garantizando el mantenimiento de cada uno de sus equipos.</p>
+                                </div>
+                                <div class="modal-footer etiqueta_modal">
+                                    <button class="btn dest1" type="button" data-dismiss="modal">
+                                        Cerrar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item col-sm-12 col-lg-4">
+                <div>
+                    <button class="dest1 tamano" data-toggle="modal" data-target="#alertaModal2">
+                        Contáctenos
+                    </button>
+            
+                    <div class="modal" id="alertamodal2" tabindex="-1" role="dialog" aria-labelledby="titulo" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content ">
+                                <div class="modal-header etiqueta_modal">
+                                    <h5 id="titulo">Contáctenos</h5>
+                                    <button class="close" data-dismiss="modal" aria-label="cerrar">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                  <form id="formulario" method="GET">
+                                    <div class="form-group mb-5 col-12">
+                                        <label for="rut">Rut</label> 
+                                        <input type="text" name="rut" id="rut" class="form-control" maxlength="12" required placeholder="Ingrese su rut sin puntos ni dígito verificador" onkeyup="formatRut(this)">                          
+                                    </div>
+
+                                    <div class="form-group mb-5 col-12">
+                                        <label for="nombre" >Nombre completo</label> 
+                                        <input id="nombre_completo" type="text" name="nombre" class="form-control" required placeholder="Escriba su nombre completo" onkeypress="return sololetras(event)" onpaste="return false">                             
+                                    </div>
+
+                                    <div class="form-group mb-5 col-6">
+                                        <label for="nacimiento" >Fecha de nacimiento</label>
+                                        <input type="date" name="nacimiento" required class="form-control">                               
+                                    </div>
+
+                                    <div class="form-group mb-5 col-12">
+                                        <label for="fono" >Telefono</label>  
+                                        <input type="text" name="fono" id="fono" class="form-control" maxlength="14" placeholder="Ingrese su número con formato 569XXXXXXXX" onkeyup="formatFono(this)" onkeypress="return valida_numeros(event)">
+                                        <p id="opcional">opcional</p>                             
+                                    </div>
+
+                                    <div class="form-group mb-5 col-12">
+                                        <label for="correo" >Correo</label>  
+                                        <input type="text" name="correo" class="form-control" required placeholder="Ingrese su correo">                             
+                                    </div>
+
+                                    <div>
+                                      <label for="mensaje" >Mensaje</label>
+                                      <textarea name="message" class="md-textarea form-control" rows="3" maxlength="200" placeholder="Ingrese su mensaje" onkeyup="countChars(this);"></textarea>
+                                    </div>
+                                    <p id="charNum">0 letras</p>
+                                    <button class="btn dest1" type="submit">ENVIAR</button>
+                                    
+                                  </form>
+                                </div>
+                                <div class="modal-footer etiqueta_modal">
+                                  <br><br>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>   
+    </nav>
+
+
+    <section>
+       <div class="container">
+        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+              <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+              <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+              <li data-target="#carouselExampleCaptions" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img src="img/GAMHAL/camp1.jpg" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>Estación de trabajo para laboratorio</h5>
+                  <p>Acero inoxidable, calidad AISI 304</p>
+                </div>
+              </div>
+              <div class="carousel-item">   
+                <img src="img/GAMHAL/camp2.jpg" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>Campana de exctracción de gases de sobremesa</h5>
+                  <p>Ventilador centrífugo con velocidad variable</p>
+                </div>
+              </div>
+              <div class="carousel-item">
+                <img src="img/GAMHAL/camp3.jpg" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                  <h5>Campana de extracción de gases con soporte</h5>
+                  <p>Acero inoxidable, calidad AISI 304</p>
+                </div>
+              </div>
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="sr-only">Next</span>
+            </a>
+          </div>
+       </div>
+    </section>
+    <br>    
+    <hr>
+    <section>
+        <div class="container rounded" id="cont1">
+          <br>
+          <h2 class="dest2">ACCESORIOS DESTACADOS</h2>
+          <br/>
+            <div class="row justify-content-center">
+
+
+                <div class="card" style="width: 12rem;">
+                    <div class="card-body">
+                      <a type="button" data-toggle="modal" data-target="#panel_digital">
+                        <h5 class="link_card">Panel Digital Gamhal</h5>
+                      </a>
+                      <p class="card-text">Un panel digital que controla el flujo de aire entrante.</p>
+                    </div>
+                    <hr>
+                    <img src="img/GAMHAL/panel.jpg" class="card-img-top" alt="...">
+                    <div class="card-footer">
+                      <p class="card_footer">30/09/2020</p>
+                    </div>
+
+                    <div class="modal" id="panel_digital" tabindex="-1">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header etiqueta_modal">
+                            <h5 class="modal-title">Panel Digital Gamhal</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <img id="fotopanel" src="img/GAMHAL/panel.jpg" alt="">
+                            <p>Un panel digital que controla el flujo de aire entrante con un ciclo configurable de
+                               purificación asegura que todos los residuos contaminantes sean eliminados de la zona de 
+                               trabajo en la campana antes que se inicie los procesos diariamente. </p>
+                          </div>
+                          <div class="modal-footer etiqueta_modal">
+                            <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+
+                  </div>
+                  <div class="card" style="width: 12rem;">
+                    <div class="card-body">
+                      <a type="button" data-toggle="modal" data-target="#porta_objetos">
+                        <h5 class="link_card">Caja Porta Objetos</h5>
+                      </a>
+                      <p class="card-text">Lámina de vidrio rectangular ideal para almacenar muestras.</p>
+                    </div>
+                    <hr>
+                    <img src="img/GAMHAL/porta-objetos.jpg" class="card-img-top" alt="...">
+                    <div class="card-footer">
+                        <p class="card_footer">30/09/2020</p>
+                    </div>
+
+                    <div class="modal" id="porta_objetos" tabindex="-1">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header etiqueta_modal">
+                            <h5 class="modal-title">Cajas Porta Obejtos</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <img id="foto_objetos" src="img/GAMHAL/porta-objetos.jpg" alt="">
+                            <p>Lámina de vidrio rectangular ideal para almacenar muestras y objetos con el fin de 
+                              observarlas bajo el microscopio. Requiere de cubreobjetos para mantener segura la muestra a observar.</p>
+                          </div>
+                          <div class="modal-footer etiqueta_modal">
+                            <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                          </div>
+                        </div>
+                      </div>
+                  </div>
+                  </div>
+
+
+                  <div class="card" style="width: 12rem;">
+                    <div class="card-body">
+                      <a type="button" data-toggle="modal" data-target="#canastillo">
+                        <h5 class="link_card">Canastillos</h5>
+                      </a>
+                      <p class="card-text">Canastillo de acero inoxidable</p>
+                    </div>
+                    <hr>
+                    <img src="img/GAMHAL/canastillo-frasco.jpg" class="card-img-top" alt="...">
+                    <div class="card-footer">
+                      <p class="card_footer">30/09/2020</p>
+                    </div>
+                  </div>
+
+                  <div class="modal" id="canastillo" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header etiqueta_modal">
+                          <h5 class="modal-title">Canastillos</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <img id="foto_canastillo" src="img/GAMHAL/canastillo-frasco.jpg" alt="">
+                          <p>	
+                            Canastillo de acero inoxidable para 60 porta objetos con Frasco de cristal con tapa.</p>
+                        </div>
+                        <div class="modal-footer etiqueta_modal">
+                          <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+
+
+                  <div class="card" style="width: 12rem;">
+                    <div class="card-body">
+                      <a type="button" data-toggle="modal" data-target="#cupula">
+                        <h5 class="link_card">Cúpula</h5>
+                      </a>
+                      <p class="card-text">Cúpula para extracción de gases</p>
+                    </div>
+                    <hr>
+                    <img src="img/GAMHAL/cupula-900.jpg" class="card-img-top" alt="...">
+                    <div class="card-footer">
+                      <p class="card_footer">30/09/2020</p>
+                    </div>
+                  </div>
+
+                  <div class="modal" id="cupula" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header etiqueta_modal">
+                          <h5 class="modal-title">Cúpula para extracción de gases</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <img id="foto_cupula" src="img/GAMHAL/cupula-900.jpg" alt="">
+                          <p>	
+                            Cúpula para extracción de gases para procesadores de tejidos rotatorio</p>
+                        </div>
+                        <div class="modal-footer etiqueta_modal">
+                          <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+                  <div class="card" style="width: 12rem;">
+                    <div class="card-body">
+                      <a type="button" data-toggle="modal" data-target="#extractor">
+                        <h5 class="link_card">Ventilador Centrífugo</h5>
+                      </a>
+                      <p class="card-text">Ventilador centrífugo con velocidad variable</p>
+                    </div>
+                    <hr>
+                    <img src="img/GAMHAL/extractor.jpg" class="card-img-top" alt="...">
+                    <div class="card-footer">
+                      <p class="card_footer">30/09/2020</p>
+                    </div>
+                  </div>
+
+                  <div class="modal" id="extractor" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header etiqueta_modal">
+                          <h5 class="modal-title">Ventilador centrífugo</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <img id="foto_extractor" src="img/GAMHAL/extractor.jpg" alt="">
+                          <p>	
+                            Ventilador centrífugo con velocidad variable, con capacidad de extracción 1500m3/h, y con bajo nivel de ruido, inferior a 59dB</p>
+                        </div>
+                        <div class="modal-footer etiqueta_modal">
+                          <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+    <br>
+    <article>
+        <div class="container rounded" id="cont2">
+            <br>
+            <h2 class="dest2">PRODUCTOS MÁS VENDIDOS</h2>
+
+            <div class="row">
+                <button class="btn col-6 col-lg-2 col-md-6 col-sm-6" data-toggle="modal" data-target="#foto1">
+                  <div class="prueba_borde">
+                    <img class="fotos_galeria" src="img/GAMHAL/gal1.jpg" alt="">
+                  </div>
+                </button>
+
+                <div class="modal" id="foto1" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header etiqueta_modal">
+                          <h5 class="modal-title">Estante Ventilado</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <img src="img/GAMHAL/galeria1.jpg" alt="" class="foto_gal">
+                        </div>
+                        <div class="modal-footer etiqueta_modal">
+                          <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                
+                <button class="btn col-6 col-lg-2 col-md-6 col-sm-6" data-toggle="modal" data-target="#foto2">
+                  <div class="prueba_borde">
+                    <img class="fotos_galeria" src="img/GAMHAL/gal2.jpg" alt="">
+                  </div>
+                </button>
+
+                <div class="modal" id="foto2" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header etiqueta_modal">
+                          <h5 class="modal-title">Cámara de extracción</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <img src="img/GAMHAL/galeria2.jpg" alt="" class="foto_gal">
+                        </div>
+                        <div class="modal-footer etiqueta_modal">
+                          <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+                <button class="btn col-6 col-lg-2 col-md-6 col-sm-6" data-toggle="modal" data-target="#foto3">
+                  <div class="prueba_borde">
+                    <img class="fotos_galeria" src="img/GAMHAL/gal3.jpg" alt="">
+                  </div>
+                </button>
+
+                <div class="modal" id="foto3" tabindex="-1">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header etiqueta_modal">
+                          <h5 class="modal-title">Estación de trabajo</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <img src="img/GAMHAL/galeria3.jpg" alt="" class="foto_gal">
+                        </div>
+                        <div class="modal-footer etiqueta_modal">
+                          <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+                <button class="btn col-6 col-lg-2 col-md-6 col-sm-6" data-toggle="modal" data-target="#foto4">
+                  <div class="prueba_borde">
+                    <img class="fotos_galeria" src="img/GAMHAL/gal4.jpg" alt="">
+                  </div>
+                </button>
+
+                <div class="modal" id="foto4" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header etiqueta_modal">
+                        <h5 class="modal-title">Camapana de extracción de gases</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <img src="img/GAMHAL/galeria4.jpg" alt="" class="foto_gal">
+                      </div>
+                      <div class="modal-footer etiqueta_modal">
+                        <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+                <button class="btn col-6 col-lg-2 col-md-6 col-sm-6" data-toggle="modal" data-target="#foto5">
+                  <div class="prueba_borde">
+                    <img class="fotos_galeria" src="img/GAMHAL/gal5.jpg" alt="">
+                  </div>
+                </button>
+
+                <div class="modal" id="foto5" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header etiqueta_modal">
+                        <h5 class="modal-title">Armario con ventilación controlada</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <img src="img/GAMHAL/galeria5.jpg" alt="" class="foto_gal">
+                      </div>
+                      <div class="modal-footer etiqueta_modal">
+                        <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+                <button class="btn col-6 col-lg-2 col-md-6 col-sm-6 col-xs-6" data-toggle="modal" data-target="#foto6">
+                  <div class="prueba_borde">
+                    <img class="fotos_galeria" src="img/GAMHAL/gal6.jpg" alt="">
+                  </div>
+                </button>
+
+                <div class="modal" id="foto6" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header etiqueta_modal">
+                        <h5 class="modal-title">Estación de trabajo con soporte</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <img src="img/GAMHAL/galeria6.jpg" alt="" class="foto_gal">
+                      </div>
+                      <div class="modal-footer etiqueta_modal">
+                        <button type="button" class="btn dest1" data-dismiss="modal">Cerrar</button>
+                      </div>
+                    </div>
+                  </div>
+              </div>
+
+            </div>
+        </div>
+    </article>
+    
+
+    <br>
+    <hr>
+
+    <footer>
+      <p>Rodrigo Acevedo</p>
+    </footer>
+
+    
+
+    
+
+    
+    
+    
+      
+
+    <script>
+      $('.carousel').carousel({
+        interval: 3000
+      })
+
+
+
+    </script>
+    
+
+</body>
+</html>
